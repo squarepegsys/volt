@@ -43,6 +43,10 @@ SITE = Config(
     # to site directory
     IGNORE_PATTERN = '',
 
+    # String replacement scheme for slugs
+    # Dictionary, key is the string to replace, value is the replacement string
+    SLUG_CHAR_MAP = {},
+
     # Widgets that do not depend on engine units
     WIDGETS = (),
 
