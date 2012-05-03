@@ -101,14 +101,28 @@ class VoltHTTPServer(ThreadingTCPServer, LoggableMixin):
         # mtime due to the newly created output site directory
         # but we do want to add voltconf.py, since the user might want to
         # check the effects of changing certain configs
-        dirs = (x[0] for x in os.walk(CONFIG.VOLT.ROOT_DIR) if
-                CONFIG.VOLT.SITE_DIR not in x[0] and CONFIG.VOLT.ROOT_DIR != x[0])
+        watched_files = []
+        for curdir, dirs, files in os.walk(CONFIG.VOLT.ROOT_DIR):
+            # site output directory is not monitored for changes, of course
+            # neither is the root directory
+            if curdir.startswith(CONFIG.VOLT.SITE_DIR) or \
+                    curdir == CONFIG.VOLT.ROOT_DIR:
+                continue
+            watched_files.extend([os.path.join(curdir, x) for x in files])
 
-        files = [CONFIG.VOLT.USER_CONF]
+        volt_files = [CONFIG.VOLT.USER_CONF]
         if os.path.exists(CONFIG.VOLT.USER_WIDGET):
-            files.append(CONFIG.VOLT.USER_WIDGET)
+            volt_files.append(CONFIG.VOLT.USER_WIDGET)
 
-        return max(os.stat(x).st_mtime for x in chain(dirs, files))
+        # get tuple of (filename, mtime)
+        file_mtimes = [(x, os.stat(x).st_mtime) for x in \
+                chain(watched_files, volt_files)]
+        latest_mtime = max((x[1] for x in file_mtimes))
+        latest = [pair for pair in file_mtimes if pair[1] == latest_mtime][0]
+
+        print latest
+
+        return latest_mtime
 
     def server_bind(self):
         # overrides server_bind to store the server name.
