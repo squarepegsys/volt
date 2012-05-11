@@ -85,6 +85,10 @@ class AtomicPlugin(Plugin):
         # render and write to output file for each key: value pair in FEEDS
         for field, outfile in self.config.FEEDS.iteritems():
 
+            # create output dir if doesn't exist
+            if not os.path.exists(self.config.OUTPUT_DIR):
+                os.makedirs(self.config.OUTPUT_DIR)
+
             atom_file_ptr = os.path.join(self.config.OUTPUT_DIR, outfile)
 
             # if attr == '', then we take all units
