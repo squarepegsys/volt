@@ -45,4 +45,4 @@ class MarkdownParser(Plugin):
             # if markdown, then process
             if is_markdown:
                 string = getattr(unit, 'content')
-                setattr(unit, 'content', markdown.markdown(string))
+                setattr(unit, 'content', markdown.markdown(string,['def_list','footnotes']))
